@@ -1,1 +1,126 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
+#define N 10
+#define MAYIN_ORANI 0.05
+#define G 'G'
+#define C 'Ç'
+#define MAYIN 'X'
+#define BOS_ALAN 'O'
+
+char tahta[N][N];
+int oyuncuX, oyuncuY;
+
+// Fonksiyon prototipleri
+void tahtaSifirla();
+void mayinlariYerlestir();
+void oyunTahtasiniYazdir();
+void oyuncuHamlesiAl();
+int oyunDurumuKontrol();
+
+int main() {
+    srand(time(NULL));
+
+    while (1) {
+        tahtaSifirla();
+        mayinlariYerlestir();
+        oyuncuX = 0;
+        oyuncuY = 0;
+
+        while (1) {
+            oyunTahtasiniYazdir();
+            oyuncuHamlesiAl();
+
+            int durum = oyunDurumuKontrol();
+            if (durum == 1) {
+                printf("Tebrikler! Oyunu kazandınız!\n");
+                break;
+            } else if (durum == -1) {
+                printf("Oyunu kaybettiniz. Yeniden denemek ister misiniz? (E/H): ");
+                char cevap;
+                scanf(" %c", &cevap);
+                if (cevap != 'E' && cevap != 'e') {
+                    printf("Oyun sona erdi. İyi günler!\n");
+                    return 0;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+void tahtaSifirla() {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            tahta[i][j] = BOS_ALAN;
+        }
+    }
+    tahta[oyuncuX][oyuncuY] = G;
+    tahta[N - 1][N - 1] = C;
+}
+
+void mayinlariYerlestir() {
+    int toplamMayin = N * N * MAYIN_ORANI;
+
+    while (toplamMayin > 0) {
+        int x = rand() % N;
+        int y = rand() % N;
+
+        if (tahta[x][y] != MAYIN && tahta[x][y] != G && tahta[x][y] != C) {
+            tahta[x][y] = MAYIN;
+            toplamMayin--;
+        }
+    }
+}
+
+void oyunTahtasiniYazdir() {
+    system("clear");  // Windows için "cls", Linux için "clear"
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%c ", tahta[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void oyuncuHamlesiAl() {
+    printf("Yon tuslariyla hareket edin (w,a,s,d): ");
+    char hareket;
+    scanf(" %c", &hareket);
+
+    switch (hareket) {
+        case 'w':
+            if (oyuncuX > 0)
+                oyuncuX--;
+            break;
+        case 'a':
+            if (oyuncuY > 0)
+                oyuncuY--;
+            break;
+        case 's':
+            if (oyuncuX < N - 1)
+                oyuncuX++;
+            break;
+        case 'd':
+            if (oyuncuY < N - 1)
+                oyuncuY++;
+            break;
+        default:
+            printf("Geçersiz hamle! Lütfen yön tuşlarını kullanın.\n");
+    }
+}
+
+int oyunDurumuKontrol() {
+    if (tahta[oyuncuX][oyuncuY] == MAYIN) {
+        return -1;  // Oyunu kaybetme durumu
+    } else if (tahta[oyuncuX][oyuncuY] == C) {
+        return 1;   // Oyunu kazanma durumu
+    }
+
+    return 0;  // Oyun devam ediyor
+}
