@@ -9,6 +9,7 @@
 #define C 'Ç'
 #define MAYIN 'X'
 #define BOS_ALAN 'O'
+#define guvensizBolge 'o'
 
 char tahta[N][N];
 int oyuncuX, oyuncuY;
@@ -19,6 +20,10 @@ void mayinlariYerlestir();
 void oyunTahtasiniYazdir();
 void oyuncuHamlesiAl();
 int oyunDurumuKontrol();
+void guvensizBolgeleriYerlestir(int,int);
+void oyunTahtasiniGizliYazdir(); 
+void mayinAlaniTablosu();
+void sonTablo();
 
 int main() {
     srand(time(NULL));
@@ -35,14 +40,36 @@ int main() {
 
             int durum = oyunDurumuKontrol();
             if (durum == 1) {
-                printf("Tebrikler! Oyunu kazandınız!\n");
-                break;
-            } else if (durum == -1) {
+            	system("cls");
+                printf("\033[0;32mTebrikler! Oyunu kazandiniz!\033[0m\n\n\a");
+                sonTablo();
+                printf("\ntekrardan oynamak ister misiniz? (E/H): ");
+                char cevap1;
+                scanf(" %c", &cevap1);
+                if (cevap1 == 'E' || cevap1 == 'e')
+				break;               	
+				else
+				return 0;
+            } 
+            else if (durum == 2)
+            {
+            	system("cls");
+            	mayinAlaniTablosu();
+            	printf("mayin alanina girdiniz!\n");
+            	oyuncuX = 0, oyuncuY = 0;
+                printf("Oyunu sifirlamak ister misiniz? (E/H): ");
+                char cevap;
+                scanf(" %c", &cevap);
+                if (cevap == 'E' || cevap == 'e')
+				break;     
+                
+			}
+			else if (durum == -1) {
                 printf("Oyunu kaybettiniz. Yeniden denemek ister misiniz? (E/H): ");
                 char cevap;
                 scanf(" %c", &cevap);
                 if (cevap != 'E' && cevap != 'e') {
-                    printf("Oyun sona erdi. İyi günler!\n");
+                    printf("Oyun sona erdi. Iyi günler!\n");
                     return 0;
                 } else {
                     break;
@@ -71,12 +98,30 @@ void mayinlariYerlestir() {
         int x = rand() % N;
         int y = rand() % N;
 
-        if (tahta[x][y] != MAYIN && tahta[x][y] != G && tahta[x][y] != C) {
+        if (tahta[x][y] != MAYIN && tahta[x][y] != G && tahta[x][y] != C) {  
             tahta[x][y] = MAYIN;
-            toplamMayin--;
+             if (tahta[1][0] == MAYIN || tahta[0][1] == MAYIN || tahta[N-2][N-1] == MAYIN || tahta[N-1][N-2] == MAYIN)
+             {
+             	continue;
+			 }  
+			 else
+			 {
+			 	guvensizBolgeleriYerlestir(x,y);
+            	toplamMayin--;
+			 }
         }
     }
 }
+
+void guvensizBolgeleriYerlestir(int X, int Y) 
+{
+    if (X > 0 && tahta[X-1][Y] == BOS_ALAN) tahta[X-1][Y] = guvensizBolge;
+    if (X < N-1 && tahta[X+1][Y] == BOS_ALAN) tahta[X+1][Y] = guvensizBolge;
+    if (Y > 0 && tahta[X][Y-1] == BOS_ALAN) tahta[X][Y-1] = guvensizBolge;
+    if (Y < N-1 && tahta[X][Y+1] == BOS_ALAN) tahta[X][Y+1] = guvensizBolge;
+}
+
+
 
 void oyunTahtasiniGizliYazdir() 
 {
@@ -100,7 +145,7 @@ void oyunTahtasiniYazdir()
 {
     if (tahta[oyuncuX][oyuncuY] == MAYIN) {
         oyunTahtasiniGizliYazdir();
-        printf("Mayına carptınız! Oyunu kaybettiniz.\n");
+        printf("Mayýna carptýnýz! Oyunu kaybettiniz.\n");
         exit(0);  // Oyuncu kaybetti, programı sonlandır
     } else if (oyuncuX==9 && oyuncuY==9) {
         //oyunTahtasiniGizliYazdir();
@@ -134,16 +179,55 @@ void oyuncuHamlesiAl() {
                 oyuncuY++;
             break;
         default:
-            printf("Geçersiz hamle! Lütfen yön tuşlarını kullanın.\n");
+            printf("Gecersiz hamle! Lutfen yon tuslarini kullanin.\n"); 
     }
 }
 
 int oyunDurumuKontrol() {
     if (tahta[oyuncuX][oyuncuY] == MAYIN) {
         return -1;  // Oyunu kaybetme durumu
-    } else if (tahta[oyuncuX][oyuncuY] == C) {
+    } 
+    else if (tahta[oyuncuX][oyuncuY] == guvensizBolge)
+    {
+    	return 2; // başa dönme durumu
+	}
+	else if (tahta[oyuncuX][oyuncuY] == C) {
         return 1;   // Oyunu kazanma durumu
     }
 
     return 0;  // Oyun devam ediyor
+}
+
+void mayinAlaniTablosu () // mayın alanýna girildiği zaman gösterilecek tablo
+{
+	    for (int i = 0; i < N; i++) 
+		{
+        for (int j = 0; j < N; j++) 
+		{
+            if (i == oyuncuX && j == oyuncuY)
+            printf("\033[0;31m%c \033[0m", tahta[i][j]);  // Oyuncunun mevcut konumu
+            else
+            printf("%c ", BOS_ALAN);  
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void sonTablo ()
+{
+		for (int i = 0; i < N; i++) 
+		{
+        for (int j = 0; j < N; j++) 
+		{
+            if (tahta[i][j] == MAYIN)
+            printf("\033[0;31m%c \033[0m", tahta[i][j]);  // mayınların gösterimi
+            else if (tahta[i][j] == guvensizBolge)
+            printf("\033[0;33m%c \033[0m", tahta[i][j]); // güvensiz bölgelerin gösterimi
+            else
+            printf("%c ", tahta[i][j]); 
+        }
+        printf("\n");
+    }
+    printf("\n");	
 }
