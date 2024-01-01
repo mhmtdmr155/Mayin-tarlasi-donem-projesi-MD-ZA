@@ -3,58 +3,70 @@
 #include <time.h>
 
 
-#define N 10
 #define MAYIN_ORANI 0.05
 #define G 'G'
-#define C 'Ç'
+#define C 'C'
 #define MAYIN 'X'
 #define BOS_ALAN 'O'
 #define guvensizBolge 'o'
 
-char tahta[N][N];
+char tahta[100][100];
 int oyuncuX, oyuncuY;
+int oyuncuYerleri[100][2];
+int a = 1; // a oyuncu yerlerini kaydetmek için
 
 // Fonksiyon prototipleri
-void tahtaSifirla();
-void mayinlariYerlestir();
-void oyunTahtasiniYazdir();
-void oyuncuHamlesiAl();
+void tahtaSifirla(int);
+void mayinlariYerlestir(int);
+void guvensizBolgeleriYerlestir(int,int,int);
+void oyunTahtasiniGizliYazdir(int);
+void oyuncuHamlesiAl(int);
 int oyunDurumuKontrol();
-void guvensizBolgeleriYerlestir(int,int);
-void oyunTahtasiniGizliYazdir(); 
-void mayinAlaniTablosu();
-void sonTablo();
+void mayinAlaniTablosu(int);
+void sonTablo(int);
+void gecilenYerleriSifirlama();
+
 
 int main() {
     srand(time(NULL));
+    tekrardanOyna:
+    system("cls");
+    int N;
+    printf("tahta boyutunu giriniz: ");
+    scanf("%d", &N);
+    oyuncuYerleri[0][0] = 0;
+	oyuncuYerleri[0][1] = 0; 
 
     while (1) {
-        tahtaSifirla();
-        mayinlariYerlestir();
-        oyuncuX = 0;
-        oyuncuY = 0;
+        tahtaSifirla(N);
+        mayinlariYerlestir(N);
+		gecilenYerleriSifirlama();
 
         while (1) {
-            oyunTahtasiniYazdir();
-            oyuncuHamlesiAl();
-
+            oyunTahtasiniGizliYazdir(N);
+            oyuncuHamlesiAl(N);
+            oyuncuYerleri[a][0] = oyuncuY;
+			oyuncuYerleri[a][1] = oyuncuX;
+			a++;
+            
             int durum = oyunDurumuKontrol();
             if (durum == 1) {
             	system("cls");
                 printf("\033[0;32mTebrikler! Oyunu kazandiniz!\033[0m\n\n\a");
-                sonTablo();
+                sonTablo(N);
                 printf("\ntekrardan oynamak ister misiniz? (E/H): ");
                 char cevap1;
                 scanf(" %c", &cevap1);
                 if (cevap1 == 'E' || cevap1 == 'e')
-				break;               	
+				goto tekrardanOyna;               	
 				else
 				return 0;
             } 
             else if (durum == 2)
             {
             	system("cls");
-            	mayinAlaniTablosu();
+            	mayinAlaniTablosu(N);
+            	gecilenYerleriSifirlama();
             	printf("mayin alanina girdiniz!\n");
             	oyuncuX = 0, oyuncuY = 0;
                 printf("Oyunu sifirlamak ister misiniz? (E/H): ");
@@ -69,7 +81,7 @@ int main() {
                 char cevap;
                 scanf(" %c", &cevap);
                 if (cevap != 'E' && cevap != 'e') {
-                    printf("Oyun sona erdi. Iyi günler!\n");
+                    printf("Oyun sona erdi. Iyi gunler!\n");
                     return 0;
                 } else {
                     break;
@@ -81,7 +93,9 @@ int main() {
     return 0;
 }
 
-void tahtaSifirla() {
+void tahtaSifirla(int N) {
+    oyuncuX = 0;
+    oyuncuY = 0;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             tahta[i][j] = BOS_ALAN;
@@ -91,7 +105,7 @@ void tahtaSifirla() {
     tahta[N - 1][N - 1] = C;
 }
 
-void mayinlariYerlestir() {
+void mayinlariYerlestir(int N) {
     int toplamMayin = N * N * MAYIN_ORANI;
 
     while (toplamMayin > 0) {
@@ -106,14 +120,14 @@ void mayinlariYerlestir() {
 			 }  
 			 else
 			 {
-			 	guvensizBolgeleriYerlestir(x,y);
+			 	guvensizBolgeleriYerlestir(x,y,N);
             	toplamMayin--;
 			 }
         }
     }
 }
 
-void guvensizBolgeleriYerlestir(int X, int Y) 
+void guvensizBolgeleriYerlestir(int X, int Y, int N) 
 {
     if (X > 0 && tahta[X-1][Y] == BOS_ALAN) tahta[X-1][Y] = guvensizBolge;
     if (X < N-1 && tahta[X+1][Y] == BOS_ALAN) tahta[X+1][Y] = guvensizBolge;
@@ -123,17 +137,17 @@ void guvensizBolgeleriYerlestir(int X, int Y)
 
 
 
-void oyunTahtasiniGizliYazdir() 
+void oyunTahtasiniGizliYazdir(int N) 
 {
     system("cls");  // Windows için "cls", Linux için "clear"
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (i == oyuncuX && j == oyuncuY) {
-                printf("%c ", G);  // Oyuncunun mevcut konumu
+                printf("\033[0;34m%c \033[0m", G);  // Oyuncunun mevcut konumu
             } else if (tahta[i][j] == C) {
-                printf("%c ", BOS_ALAN);  // Çıkış noktasını göster
+                printf("\033[0;32m%c \033[0m", C);  // çıkış noktasini göster
             } else {
-                printf("%c ", BOS_ALAN);  // Mayınları gösterme
+                printf("%c ", BOS_ALAN);  // Mayinlari gösterme
             }
         }
         printf("\n");
@@ -141,22 +155,7 @@ void oyunTahtasiniGizliYazdir()
     printf("\n");
 }
 
-void oyunTahtasiniYazdir() 
-{
-    if (tahta[oyuncuX][oyuncuY] == MAYIN) {
-        oyunTahtasiniGizliYazdir();
-        printf("Mayýna carptýnýz! Oyunu kaybettiniz.\n");
-        exit(0);  // Oyuncu kaybetti, programı sonlandır
-    } else if (oyuncuX==9 && oyuncuY==9) {
-        //oyunTahtasiniGizliYazdir();
-        printf("Tebrikler Oyunu kazandiniz!\n");
-        exit(0);  // Oyuncu başardı tebrikler...
-    } else {
-        oyunTahtasiniGizliYazdir();
-    }
-}
-
-void oyuncuHamlesiAl() {
+void oyuncuHamlesiAl(int N) {
     printf("Yon tuslariyla hareket edin (w,a,s,d): ");
     char hareket;
     scanf(" %c", &hareket);
@@ -198,7 +197,7 @@ int oyunDurumuKontrol() {
     return 0;  // Oyun devam ediyor
 }
 
-void mayinAlaniTablosu () // mayın alanýna girildiği zaman gösterilecek tablo
+void mayinAlaniTablosu(int N) // mayın alanına girildiği zaman gösterilecek tablo
 {
 	    for (int i = 0; i < N; i++) 
 		{
@@ -214,20 +213,48 @@ void mayinAlaniTablosu () // mayın alanýna girildiği zaman gösterilecek tabl
     printf("\n");
 }
 
-void sonTablo ()
+void sonTablo(int N)
 {
 		for (int i = 0; i < N; i++) 
 		{
         for (int j = 0; j < N; j++) 
 		{
+			int gecildi = 0;
+			if (i == (N-1) && j == (N-1))
+			{
+				printf("\033[0;32mG \033[0m");
+				gecildi++;
+			}
+			
+			for (int a = 0; oyuncuYerleri[a][0] != (N-1) || oyuncuYerleri[a][1] != (N-1); a++)
+			{
+				if (oyuncuYerleri[a][0] == j && oyuncuYerleri[a][1] == i )
+				{
+					printf("\033[0;32mG \033[0m");
+					gecildi++;
+					break;
+				}
+			}
             if (tahta[i][j] == MAYIN)
-            printf("\033[0;31m%c \033[0m", tahta[i][j]);  // mayınların gösterimi
+            printf("\033[0;31m%c \033[0m", tahta[i][j]);  // mayinların gösterimi
             else if (tahta[i][j] == guvensizBolge)
             printf("\033[0;33m%c \033[0m", tahta[i][j]); // güvensiz bölgelerin gösterimi
-            else
+            else if (gecildi == 0)
             printf("%c ", tahta[i][j]); 
         }
         printf("\n");
     }
     printf("\n");	
+}
+
+void gecilenYerleriSifirlama()
+{
+	a = 1;
+	for (int i = 0; i < 100; i++) 
+	{
+    	for (int j = 0; j < 2; j++) 
+		{
+        	oyuncuYerleri[i][j] = 0; // Tüm elemanlara sifir atama
+   		}	
+   	}
 }
