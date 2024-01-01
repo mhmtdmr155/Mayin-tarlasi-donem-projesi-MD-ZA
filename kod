@@ -1,3 +1,7 @@
+//Mehmet Demir-22110131033
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -15,7 +19,7 @@ int oyuncuX, oyuncuY;
 int oyuncuYerleri[100][2];
 int a = 1; // a oyuncu yerlerini kaydetmek için
 
-// Fonksiyon prototipleri
+// Fonksiyon Tanımlama kısmı
 void tahtaSifirla(int);
 void mayinlariYerlestir(int);
 void guvensizBolgeleriYerlestir(int,int,int);
