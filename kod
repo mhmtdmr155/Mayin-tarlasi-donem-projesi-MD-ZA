@@ -58,13 +58,18 @@ int main() {
             	system("cls");
                 printf("\033[0;32mTebrikler! Oyunu kazandiniz!\033[0m\n\n\a");
                 sonTablo(N);
-                printf("\ntekrardan oynamak ister misiniz? (E/H): ");
+                printf("\ntekrardan oynamak ister misiniz? Evet/Hayir -->  (E/H): ");
                 char cevap1;
                 scanf(" %c", &cevap1);
                 if (cevap1 == 'E' || cevap1 == 'e')
 				goto tekrardanOyna;               	
 				else
 				return 0;
+				
+				
+				
+				
+				
             } 
             else if (durum == 2)
             {
@@ -73,7 +78,7 @@ int main() {
             	gecilenYerleriSifirlama();
             	printf("mayin alanina girdiniz!\n");
             	oyuncuX = 0, oyuncuY = 0;
-                printf("Oyunu sifirlamak ister misiniz? (E/H): ");
+                printf("tekrar denemek ister misiniz? Evet/Hayir --> (E/H): ");
                 char cevap;
                 scanf(" %c", &cevap);
                 if (cevap == 'E' || cevap == 'e')
@@ -81,7 +86,7 @@ int main() {
                 
 			}
 			else if (durum == -1) {
-                printf("Oyunu kaybettiniz. Yeniden denemek ister misiniz? (E/H): ");
+                printf("Oyunu kaybettiniz. Yeniden denemek ister misiniz? Evet/Hayir -->  (E/H): ");
                 char cevap;
                 scanf(" %c", &cevap);
                 if (cevap != 'E' && cevap != 'e') {
@@ -143,7 +148,7 @@ void guvensizBolgeleriYerlestir(int X, int Y, int N)
 
 void oyunTahtasiniGizliYazdir(int N) 
 {
-    system("cls");  // Windows için "cls", Linux için "clear"
+    system("cls");  // Windows için "cls" , Linux için "clear".
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             if (i == oyuncuX && j == oyuncuY) {
@@ -159,8 +164,10 @@ void oyunTahtasiniGizliYazdir(int N)
     printf("\n");
 }
 
+
+
 void oyuncuHamlesiAl(int N) {
-    printf("Yon tuslariyla hareket edin (w,a,s,d): ");
+    printf("Yon tuslariyla hareket edin (w,a,s,d), Yeniden konumlandirmak icin (R): ");
     char hareket;
     scanf(" %c", &hareket);
 
@@ -181,8 +188,13 @@ void oyuncuHamlesiAl(int N) {
             if (oyuncuY < N - 1)
                 oyuncuY++;
             break;
+        case 'R':
+        case 'r':
+            tahtaSifirla(N);
+            return;
         default:
-            printf("Gecersiz hamle! Lutfen yon tuslarini kullanin.\n"); 
+            printf("Gecersiz hamle! Lutfen yon tuslarini veya oyunu sifirlamak isterseniz'R','r' tusunu kullanin.\n"); 
+            return;
     }
 }
 
@@ -195,7 +207,7 @@ int oyunDurumuKontrol() {
     	return 2; // başa dönme durumu
 	}
 	else if (tahta[oyuncuX][oyuncuY] == C) {
-        return 1;   // Oyunu kazanma durumu
+        return 1;   // Oynu kazanma durumu
     }
 
     return 0;  // Oyun devam ediyor
@@ -258,7 +270,7 @@ void gecilenYerleriSifirlama()
 	{
     	for (int j = 0; j < 2; j++) 
 		{
-        	oyuncuYerleri[i][j] = 0; // Tüm elemanlara sifir atama
+        	oyuncuYerleri[i][j] = 0; // Tüm elemanlara sifir atamak.
    		}	
    	}
 }
